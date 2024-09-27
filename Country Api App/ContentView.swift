@@ -12,20 +12,24 @@ struct ContentView: View {
             // .prefix limits to 10
             List(searchResults, id: \.self) { country in
                 VStack {
-                    //                    Text(country.name.official)
-                    //                    Text(country.name.common)
+         
                     NavigationLink {
                         ScrollView {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(lineWidth: 2)
+                            AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
+                                Image
+                                    .border(.black, width: 3)
+                                    .scaleEffect(0.3)
                                 
-                                Text("Official Name : \(countries[0].name.official)")
-                                    .font(.title2)
-                                    .padding()
+                            } placeholder: { 
+                                Rectangle()
                             }
-                            .fixedSize()
-                            .frame(width: screenWidth/1.2)
+                            .frame(width: 25, height: 50)
+                            .padding()
+                            .shadow(color: .gray, radius: 10)
+
+                            
+                            Box(text: "Official Name : \(countries.first(where: { $0.name.common == country })?.name.official ?? "N/A")")
+                             
                         }
                         .navigationTitle(country)
                         
@@ -46,6 +50,7 @@ struct ContentView: View {
         .onChange(of: searchText) {
             if searchText != "" {
                 searchText = "\(searchText.first!.uppercased())" + searchText.dropFirst().lowercased()
+                
             }
         }
     }
@@ -83,12 +88,38 @@ struct ContentView: View {
 
 struct Country: Codable {
     var name: CountryName
+    var flags: FlagImage 
     
     struct CountryName: Codable {
         var common: String
         var official: String
     }
+    struct FlagImage: Codable {
+        var png: String
+    }
 }
+
+struct Box: View {
+    @State var text = "" 
+    @State var screenWidth = UIScreen.main.bounds.width
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(lineWidth: 2)
+            
+            Text(text)
+                .padding()
+            
+        }
+        .frame(maxWidth: screenWidth/1.2)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding()
+    }
+}
+
+
+
 #Preview {
     ContentView()
 }
