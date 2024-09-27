@@ -9,10 +9,8 @@ struct ContentView: View {
         
         NavigationStack {
             
-            // .prefix limits to 10
             List(searchResults, id: \.self) { country in
                 VStack {
-         
                     NavigationLink {
                         ScrollView {
                             AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
@@ -21,9 +19,9 @@ struct ContentView: View {
                                     .scaleEffect(0.3)
                                 
                             } placeholder: { 
-                                Rectangle()
+                                Text("Reload for Flag!")
                             }
-                            .frame(width: 25, height: 50)
+                            .frame(width: 50, height: 50)
                             .padding()
                             .shadow(color: .gray, radius: 10)
 
@@ -35,12 +33,27 @@ struct ContentView: View {
                         
                         
                     } label: {
-                        Text(country)
+                        HStack {
+                            AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
+                                Image
+                                    .border(.black, width: 3)
+                                    .scaleEffect(0.3)
+                                
+                            } placeholder: { 
+                                Text("Reload for Flag!")
+                            }
+                            .frame(width: 25, height: 0)
+                            .padding()
+                            
+                            Text(country)
+                                .padding()
+                        }
+                        .padding()
                     }
                 }
                 
             }
-            .navigationTitle("Countries")
+            .navigationTitle("Country Search")
             
         }
         .task {
@@ -59,7 +72,7 @@ struct ContentView: View {
         if searchText.isEmpty {
             return names
         } else {
-            return names.filter { $0.contains(searchText) }
+            return names.filter { $0.contains(searchText) } 
         }
     }
     
