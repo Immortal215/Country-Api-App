@@ -13,79 +13,87 @@ struct ContentView: View {
         
         NavigationStack {
         
-            List(searchResults, id: \.self) { country in
-                VStack {
-                    NavigationLink {
-                        ScrollView {
-                            AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
-                                Image
-                                    .border(.black, width: 5)
-                                    .scaleEffect(0.3)
-                                
-                            } placeholder: { 
-                                ProgressView("Loading Image...")
-                            }
-                            .frame(width: 200, height: 50)
-                            .padding()
-                            .shadow(color: .gray, radius: 10)
-                            
-                            
-                            Box(text: "Official Name : \(countries.first(where: { $0.name.common == country })?.name.official ?? "N/A")")
-                            
-                            Box(text: "Region : \(countries.first(where: { $0.name.common == country })?.region ?? "N/A")")
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(lineWidth: 3)
-                                
-                                VStack {   
-                                    Box(text :("Area : \(Int(countries.first(where: { $0.name.common == country })?.area ?? 0.0)) km²"))
-                                        .padding()
-                                        .padding(.bottom, -40)
-                                    
-                                    if let mapURLString = countries.first(where: { $0.name.common == country })?.maps.googleMaps {
-                                        ZStack {
-                                            WebView(url: URL(string: mapURLString)!, isLoading: $isLoading)
-                                                .frame(height: screenHeight/2)
-                                                .padding()
+            List {
+                
+                // goes through a-z
+                ForEach(groupedCountries.keys.sorted(), id: \.self) { letter in
+                    Section(letter) {
+                        // goes through all the countries in each letter
+                        ForEach(groupedCountries[letter] ?? [], id: \.self) { country in
+                            VStack {
+                                NavigationLink {
+                                    ScrollView {
+                                        AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
+                                            Image
+                                                .border(.black, width: 5)
+                                                .scaleEffect(0.4)
                                             
-                                            if isLoading {
-                                                ProgressView("Loading Map...")
+                                        } placeholder: { 
+                                            ProgressView("Loading Image...")
+                                        }
+                                        .frame(width: 200, height: 50)
+                                        .padding()
+                                        .shadow(color: .gray, radius: 10)
+                                        
+                                        
+                                        Box(text: "Official Name : \(countries.first(where: { $0.name.common == country })?.name.official ?? "N/A")")
+                                        
+                                        Box(text: "Region : \(countries.first(where: { $0.name.common == country })?.region ?? "N/A")")
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(lineWidth: 3)
+                                            
+                                            VStack {   
+                                                Box(text :("Area : \(Int(countries.first(where: { $0.name.common == country })?.area ?? 0.0)) km²"))
+                                                    .padding()
+                                                    .padding(.bottom, -40)
+                                                
+                                                if let mapURLString = countries.first(where: { $0.name.common == country })?.maps.googleMaps {
+                                                    ZStack {
+                                                        WebView(url: URL(string: mapURLString)!, isLoading: $isLoading)
+                                                            .frame(height: screenHeight/2)
+                                                            .padding()
+                                                        
+                                                        if isLoading {
+                                                            ProgressView("Loading Map...")
+                                                        }
+                                                    }
+                                                } else {
+                                                    Text("Map not available")
+                                                        .foregroundColor(.red)
+                                                        .padding()
+                                                }
+                                                
                                             }
                                         }
-                                    } else {
-                                        Text("Map not available")
-                                            .foregroundColor(.red)
+                                        .padding()
+                                    }
+                                    .navigationTitle(country)
+                                    
+                                    
+                                } label: {
+                                    HStack {
+                                        AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
+                                            Image
+                                                .border(.black, width: 5)
+                                                .scaleEffect(0.3)
+                                            
+                                        } placeholder: { 
+                                            ProgressView("")
+                                        }
+                                        .frame(width: 50, height: 0)
+                                        
+                                        .padding()
+                                        
+                                        Text(country)
                                             .padding()
                                     }
-                                    
+                                    .padding()
                                 }
                             }
-                            .padding()
                         }
-                        .navigationTitle(country)
-                        
-                        
-                    } label: {
-                        HStack {
-                            AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
-                                Image
-                                    .border(.black, width: 5)
-                                    .scaleEffect(0.3)
-                                
-                            } placeholder: { 
-                                ProgressView("")
-                            }
-                            .frame(width: 50, height: 0)
-            
-                            .padding()
-                            
-                            Text(country)
-                                .padding()
-                        }
-                        .padding()
                     }
                 }
-                
             }
             .navigationTitle("Country Search")
             
@@ -97,17 +105,25 @@ struct ContentView: View {
         .onChange(of: searchText) {
             if searchText != "" {
                 searchText = "\(searchText.first!.uppercased())" + searchText.dropFirst().lowercased()
-                
             }
         }
     }
     
-    var searchResults: [String] {
-        if searchText.isEmpty {
-            return names
-        } else {
-            return names.filter { $0.contains(searchText) } 
+    var groupedCountries: [String: [String]] {
+        // filter names by if it contains the search txt
+        let filteredNames = searchText.isEmpty ? names : names.filter { $0.contains(searchText) }
+        
+        var groups = [String: [String]]()
+        
+        // in those names that are in it, append any names to their letter 
+        for name in filteredNames {
+            let firstLetter = String(name.prefix(1)).uppercased()
+            
+            // default makes it so if the letter does not exist in the array, add that letter with an array
+            groups[firstLetter, default: []].append(name)
         }
+        
+        return groups
     }
     
     func fetchData() async {
@@ -122,8 +138,8 @@ struct ContentView: View {
                 countries = decodedResponse
                 for i in countries {
                     names.append(i.name.common)
-                    
                 }
+                names.sort()
             } else {
                 print("Failed to decode response")
             }
