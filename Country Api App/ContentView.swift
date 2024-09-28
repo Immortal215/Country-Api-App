@@ -35,11 +35,20 @@ struct ContentView: View {
                                         .frame(width: 200, height: 50)
                                         .padding()
                                         .shadow(color: .gray, radius: 10)
-                                        
-                                        Box(text: "Official Name : \(countryIndex?.name.official ?? "N/A")")
-                                        
-                                        Box(text: "Region : \(countryIndex?.region ?? "N/A")")
-                                        
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(lineWidth: 3)
+                                            
+                                            DisclosureGroup("Official Name : \(countryIndex?.name.official ?? "N/A")") {
+                                                Box(text: "Region : \(countryIndex?.region ?? "N/A")")
+                                                
+                                                Box(text: "Population : \(countryIndex?.population ?? 0)")
+                                            }
+                                            .foregroundStyle(.black)
+                                            .padding()
+                                        }
+                                        .padding()
+
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 15)
                                                 .stroke(lineWidth: 3)
@@ -156,6 +165,7 @@ struct Country: Codable {
     var region: String
     var maps: Maps 
     var area: Double
+    var population : Int
     
     struct CountryName: Codable {
         var common: String
@@ -233,4 +243,5 @@ struct WebView: UIViewRepresentable {
 
 #Preview {
     ContentView()
+        .preferredColorScheme(.light)
 }
