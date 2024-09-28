@@ -8,7 +8,6 @@ struct ContentView: View {
     @State var screenWidth = UIScreen.main.bounds.width
     @State var screenHeight = UIScreen.main.bounds.height
     @State var isLoading = true
-    @State var letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     var body: some View {
         
         NavigationStack {
