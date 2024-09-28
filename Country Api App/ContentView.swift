@@ -42,7 +42,7 @@ struct ContentView: View {
                                             DisclosureGroup("Official Name : \(countryIndex?.name.official ?? "N/A")") {
                                                 Box(text: "Region : \(countryIndex?.region ?? "N/A")")
                                                 
-                                                Box(text: "Population : \(countryIndex?.population ?? 0)")
+                                                Box(text: "Population : \(countryIndex?.population ?? 0) People")
                                             }
                                             .foregroundStyle(.black)
                                             .padding()
