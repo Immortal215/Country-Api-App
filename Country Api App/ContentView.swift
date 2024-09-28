@@ -19,10 +19,12 @@ struct ContentView: View {
                     Section(letter) {
                         // goes through all the countries in each letter
                         ForEach(groupedCountries[letter] ?? [], id: \.self) { country in
+                            let countryIndex = countries.first(where: { $0.name.common == country })
+
                             VStack {
                                 NavigationLink {
                                     ScrollView {
-                                        AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
+                                        AsyncImage(url: URL(string: "\(countryIndex?.flags.png ?? "N/A")")) { Image in
                                             Image
                                                 .border(.black, width: 5)
                                                 .scaleEffect(0.4)
@@ -34,20 +36,20 @@ struct ContentView: View {
                                         .padding()
                                         .shadow(color: .gray, radius: 10)
                                         
+                                        Box(text: "Official Name : \(countryIndex?.name.official ?? "N/A")")
                                         
-                                        Box(text: "Official Name : \(countries.first(where: { $0.name.common == country })?.name.official ?? "N/A")")
+                                        Box(text: "Region : \(countryIndex?.region ?? "N/A")")
                                         
-                                        Box(text: "Region : \(countries.first(where: { $0.name.common == country })?.region ?? "N/A")")
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 15)
                                                 .stroke(lineWidth: 3)
                                             
                                             VStack {   
-                                                Box(text :("Area : \(Int(countries.first(where: { $0.name.common == country })?.area ?? 0.0)) km²"))
+                                                Box(text :("Area : \(Int(countryIndex?.area ?? 0.0)) km²"))
                                                     .padding()
                                                     .padding(.bottom, -40)
                                                 
-                                                if let mapURLString = countries.first(where: { $0.name.common == country })?.maps.googleMaps {
+                                                if let mapURLString = countryIndex?.maps.googleMaps {
                                                     ZStack {
                                                         WebView(url: URL(string: mapURLString)!, isLoading: $isLoading)
                                                             .frame(height: screenHeight/2)
@@ -72,7 +74,7 @@ struct ContentView: View {
                                     
                                 } label: {
                                     HStack {
-                                        AsyncImage(url: URL(string: "\(countries.first(where: { $0.name.common == country })?.flags.png ?? "N/A")")) { Image in
+                                        AsyncImage(url: URL(string: "\(countryIndex?.flags.png ?? "N/A")")) { Image in
                                             Image
                                                 .border(.black, width: 5)
                                                 .scaleEffect(0.3)
@@ -124,7 +126,6 @@ struct ContentView: View {
         
         return groups
     }
-    
     func fetchData() async {
         guard let url = URL(string: "https://restcountries.com/v3.1/all") else {
             print("Error forming URL")
