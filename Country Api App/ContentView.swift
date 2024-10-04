@@ -8,10 +8,11 @@ struct ContentView: View {
     @State var screenWidth = UIScreen.main.bounds.width
     @State var screenHeight = UIScreen.main.bounds.height
     @State var isLoading = true
+    
     var body: some View {
         
         NavigationStack {
-        
+            
             List {
                 
                 // goes through a-z
@@ -20,7 +21,7 @@ struct ContentView: View {
                         // goes through all the countries in each letter
                         ForEach(groupedCountries[letter] ?? [], id: \.self) { country in
                             let countryIndex = countries.first(where: { $0.name.common == country })
-
+                            
                             VStack {
                                 NavigationLink {
                                     ScrollView {
@@ -29,7 +30,7 @@ struct ContentView: View {
                                                 .border(.black, width: 5)
                                                 .scaleEffect(0.4)
                                             
-                                        } placeholder: { 
+                                        } placeholder: {
                                             ProgressView("Loading Image...")
                                         }
                                         .frame(width: 200, height: 50)
@@ -48,12 +49,12 @@ struct ContentView: View {
                                             .padding()
                                         }
                                         .padding()
-
+                                        
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 15)
                                                 .stroke(lineWidth: 3)
                                             
-                                            VStack {   
+                                            VStack {
                                                 Box(text :("Area : \(Int(countryIndex?.area ?? 0.0)) km²"))
                                                     .padding()
                                                     .padding(.bottom, -40)
@@ -88,7 +89,7 @@ struct ContentView: View {
                                                 .border(.black, width: 5)
                                                 .scaleEffect(0.3)
                                             
-                                        } placeholder: { 
+                                        } placeholder: {
                                             ProgressView("")
                                         }
                                         .frame(width: 50, height: 0)
@@ -102,7 +103,10 @@ struct ContentView: View {
                                 }
                             }
                         }
+                         .font(Font.custom("Baskerville", fixedSize: 25))
+                        
                     }
+                    
                 }
             }
             .navigationTitle("Country Search")
@@ -125,7 +129,7 @@ struct ContentView: View {
         
         var groups = [String: [String]]()
         
-        // in those names that are in it, append any names to their letter 
+        // in those names that are in it, append any names to their letter
         for name in filteredNames {
             let firstLetter = String(name.prefix(1)).uppercased()
             
@@ -161,9 +165,9 @@ struct ContentView: View {
 
 struct Country: Codable {
     var name: CountryName
-    var flags: FlagImage 
+    var flags: FlagImage
     var region: String
-    var maps: Maps 
+    var maps: Maps
     var area: Double
     var population : Int
     
@@ -181,7 +185,7 @@ struct Country: Codable {
 }
 
 struct Box: View {
-    @State var text = "" 
+    @State var text = ""
     @State var screenWidth = UIScreen.main.bounds.width
     
     var body: some View {
@@ -221,14 +225,14 @@ struct WebView: UIViewRepresentable {
     
     class Coordinator: NSObject, WKNavigationDelegate {
         var parent: WebView
-        var first = true 
+        var first = true
         
         init(_ parent: WebView) {
             self.parent = parent
         }
         
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            if first { 
+            if first {
                 parent.isLoading = true
                 first = false
             }
